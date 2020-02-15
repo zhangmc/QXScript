@@ -28,7 +28,7 @@ function sign() {
       let detail = `请把日志中的输出反馈到Github`
       $notify(title, subTitle, detail)
     }
-    console.log(`${cookieName}, data: ${data}`)
+    //console.log(`${cookieName}, data: ${data}`)
   })
 }
 

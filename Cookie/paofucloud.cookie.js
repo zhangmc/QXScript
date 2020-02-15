@@ -1,5 +1,5 @@
 var paofucloud = $request.headers["Cookie"];
-console.log("aaaa"+paofucloud)
+
 if (paofucloud) {
   if ($prefs.valueForKey("CookiePFC") != undefined) {
     if ($prefs.valueForKey("CookiePFC") != paofucloud) {
@@ -19,5 +19,5 @@ if (paofucloud) {
     }
   }
 }
-console.log("bbb"+paofucloud)
+
 $done({})
