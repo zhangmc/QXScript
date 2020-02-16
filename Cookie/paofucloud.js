@@ -1,17 +1,18 @@
-console.log($prefs.valueForKey("CookiePFC"));
 var bonus = {
   url: 'https://www.paofucloud.com/user/checkin',
+  method: 'POST',
   headers: {
     "Cookie": $prefs.valueForKey("CookiePFC"),
   }
 };
-// bonus.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36';
-// bonus.headers['Host'] = 'www.paofucloud.com';
-// bonus.headers['Origin'] = 'https://www.paofucloud.com';
-// bonus.headers['Sec-Fetch-Site'] = 'same-origin';
-// bonus.headers['Sec-Fetch-Mode'] = 'cors';
-// bonus.headers['Referer'] = 'https://www.paofucloud.com/user';
+bonus.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36';
+bonus.headers['Host'] = 'www.paofucloud.com';
+bonus.headers['Origin'] = 'https://www.paofucloud.com';
+bonus.headers['Sec-Fetch-Site'] = 'same-origin';
+bonus.headers['Sec-Fetch-Mode'] = 'cors';
+bonus.headers['Referer'] = 'https://www.paofucloud.com/user';
 $task.fetch(bonus).then(response => {
+  console.log(response);
   let data = response.body;
   let result = JSON.parse(data);
   console.log(result);
