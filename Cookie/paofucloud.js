@@ -1,3 +1,4 @@
+console.log($prefs.valueForKey("CookiePFC"));
 var bonus = {
   url: 'https://paofu.cloud/user/checkin',
   headers: {
