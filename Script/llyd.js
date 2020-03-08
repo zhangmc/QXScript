@@ -9,26 +9,18 @@ MitM = vira.llsapp.com
 
 */
 
-var body = $response.body;
-var url = $request.url;
-var obj = JSON.parse(body);
+if ($response.statusCode == 200 && $request.method == 'GET') {
+	const bodyObj = JSON.parse($response.body);
 
-const vip = '/api/v2/readings/limitation';
-const time = '/api/v2/readings/accessible';
+	if ($request.url.indexOf('limitation') != -1) {
+		bodyObj.modules = [];
+		bodyObj.auditionDuration = 72000;
+	} else {
+		bodyObj.from = 1482071586
+		bodyObj.to = 1671373986
+	}
 
-if (url.indexOf(vip) != -1) {
-	obj["modules"] = [];
-	obj["auditionDuration"] = 7200;
-	body = JSON.stringify(obj);
+	$done({body: JSON.stringify(bodyObj)})
+} else {
+	$done({})
 }
-
-if (url.indexOf(time) != -1) {
-	obj["from"] = 1482071586;
-	obj["to"] = 1671373986;
-	body = JSON.stringify(obj);
-}
-
-$done({body});
-/**
- * @supported 9E1BBA07A0EF
- */
