@@ -8,12 +8,13 @@
 MitM = vira.llsapp.com
 
 */
+
 var body = $response.body;
 var url = $request.url;
 var obj = JSON.parse(body);
 
-const vip = '/api/v2/ymo/readings/limitation';
-const time = '/api/v2/ymo/readings/accessible';
+const vip = '/api/v2/readings/limitation';
+const time = '/api/v2/readings/accessible';
 
 if (url.indexOf(vip) != -1) {
 	obj["modules"] = [];
