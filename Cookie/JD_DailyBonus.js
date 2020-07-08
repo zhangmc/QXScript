@@ -2,8 +2,8 @@
 
  京东多合一签到脚本
 
- 更新时间: 2020.7.04 22:50 v1.21
- 有效接口: 23+
+ 更新时间: 2020.7.07 17:00 v1.25
+ 有效接口: 24+
  脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
  电报频道: @NobyDa
  问题反馈: @NobyDa_bot
@@ -23,6 +23,7 @@ var DualKey = ''; //如需双账号签到,此处单引号内填写抓取的"账�
    注2: 双账号用户抓取"账号1"Cookie后, 请勿点击退出账号(可能会导致Cookie失效), 需清除浏览器资料或更换浏览器登录"账号2"抓取.
    注3: 如果复制的Cookie开头为"Cookie: "请把它删除后填入.
    注4: 如果使用QX,Surge,Loon并获取Cookie后, 再重复填写以上选项, 则签到优先读取以上Cookie.
+   注5: 如果使用Node.js, 需自行安装'request'模块. 例: npm install request -g
 
 *************************
 【 QX, Surge, Loon 说明 】 :
@@ -86,7 +87,7 @@ hostname = api.m.jd.com
 
 var LogDetails = false; //是否开启响应日志, true则开启
 
-var stop = 0; //自定义延迟签到,单位毫秒. 默认并发无延迟. (延迟作用于每个签到接口, 如填入延迟则切换顺序签到. Surge用户请注意在UI界面调整脚本超时)
+var stop = 0; //自定义延迟签到,单位毫秒. 默认分批并发无延迟. (延迟作用于每个签到接口, 如填入延迟则切换顺序签到. Surge用户请注意在UI界面调整脚本超时)
 
 var DeleteCookie = false; //是否清除Cookie, true则开启
 
@@ -120,36 +121,41 @@ let acData = {
 };
 
 async function all() {
-    await JingDongSpeedUp(stop); //京东天天加速
     if (stop == 0) {
         await Promise.all([
+            JingDongSpeedUp(stop), //京东天天加速
             JingDongBean(stop), //京东京豆
             JingRongBean(stop), //金融京豆
             JingRongDoll(stop), //金融抓娃娃
             JingRongSteel(stop), //金融钢镚
             JingDongTurn(stop), //京东转盘
-            JDUserSignPre(stop, 'JDGStore', '京东商城-超市'), //京东超市
-            JDUserSignPre(stop, 'JDPet', '京东商城-宠物'), //京东宠物馆
             JDFlashSale(stop), //京东闪购
             JDOverseas(stop), //京东国际
-            JDUserSignPre(stop, 'JDBook', '京东商城-图书'), //京东图书
-            JDUserSignPre(stop, 'JDShand', '京东拍拍-二手'), //京东拍拍二手
-            JDUserSignPre(stop, 'JDMakeup', '京东商城-美妆'), //京东美妆馆
-            JDUserSignPre(stop, 'JDWomen', '京东商城-女装'), //京东女装馆
-            JDUserSignPre(stop, 'JDVege', '京东商城-菜场'), //京东菜场
             JingDongCash(stop), //京东现金红包
-            JDUserSignPre(stop, 'JDFood', '京东商城-美食'), //京东美食馆
             // JingRSeeAds(stop), //金融看广告
             // JingRongGame(stop), //金融游戏大厅
-            JDUserSignPre(stop, 'JDClean', '京东商城-清洁'), //京东清洁馆
-            JDUserSignPre(stop, 'JDCare', '京东商城-个护'), //京东个人护理馆
-            JDUserSignPre(stop, 'JDJewels', '京东商城-珠宝'), //京东珠宝馆
             // JDMagicCube(stop), //京东小魔方
             JingDongPrize(stop), //京东抽大奖
             JingDongSubsidy(stop), //京东金贴
             JingDongShake(stop) //京东摇一摇
-        ])
+        ]);
+        await Promise.all([
+            JDUserSignPre(stop, 'JDVege', '京东商城-菜场'), //京东菜场
+            JDUserSignPre(stop, 'JDFood', '京东商城-美食'), //京东美食馆
+            JDUserSignPre(stop, 'JDClean', '京东商城-清洁'), //京东清洁馆
+            JDUserSignPre(stop, 'JDCare', '京东商城-个护'), //京东个人护理馆
+            JDUserSignPre(stop, 'JDJewels', '京东商城-珠宝'), //京东珠宝馆
+            JDUserSignPre(stop, 'JDShand', '京东拍拍-二手') //京东拍拍二手
+        ]);
+        await Promise.all([
+            JDUserSignPre(stop, 'JDWomen', '京东商城-女装'), //京东女装馆
+            JDUserSignPre(stop, 'JDGStore', '京东商城-超市'), //京东超市
+            JDUserSignPre(stop, 'JDPet', '京东商城-宠物'), //京东宠物馆
+            JDUserSignPre(stop, 'JDBook', '京东商城-图书'), //京东图书
+            JDUserSignPre(stop, 'JDMakeup', '京东商城-美妆') //京东美妆馆
+        ]);
     } else {
+        await JingDongSpeedUp(stop); //京东天天加速
         await JingDongBean(stop); //京东京豆
         await JingRongBean(stop); //金融京豆
         await JingRongDoll(stop); //金融抓娃娃
@@ -753,59 +759,103 @@ function JingDongShake(s) {
 }
 
 function JDUserSignPre(s, key, title) {
+    if ($nobyda.isNode) {
+        return JDUserSignPre1(s, key, title);
+    } else if (key == 'JDWomen' || $nobyda.isJSBox) {
+        return JDUserSignPre2(s, key, title);
+    } else {
+        return JDUserSignPre1(s, key, title);
+    }
+}
+
+function JDUserSignPre1(s, key, title) {
     return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const JDUrl = {
-                url: 'https://api.m.jd.com/?client=wh5&functionId=qryH5BabelFloors',
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    Cookie: KEY,
-                },
-                body: `body={"activityId":"${acData[key]}"}`
-            };
-            if (!$nobyda.isJSBox && !$nobyda.isNode && key == "JDWomen") return reject()
-            $nobyda.post(JDUrl, function(error, response, data) {
-                try {
-                    if (error) {
-                        merge[key].notify = `${title}: 签到活动获取失败 ‼️‼️`
-                        merge[key].fail = 1
-                    } else {
-                        if (data.match(/enActK/)) { // 含有签到活动数据
-                            const od = JSON.parse(data);
-                            let params = (od.floatLayerList || []).filter(o=>o.params && o.params.match(/enActK/)).map(o=>o.params).pop();
-                            if(!params){ // 第一处找到签到所需数据
-                                // floatLayerList未找到签到所需数据，从floorList中查找
-                                let signInfo = (od.floorList || []).filter(o=>o.template=='signIn' && o.signInfos && o.signInfos.params && o.signInfos.params.match(/enActK/))
-                                    .map(o=>o.signInfos).pop();
-                                if(signInfo){
-                                    if(signInfo.signStat=='1'){
-                                        merge[key].notify = `${title}: 失败, 原因: 已签过 ⚠️`
-                                        merge[key].fail = 1
-                                        reject();
-                                        return;
-                                    } else {
-                                        params = signInfo.params;
-                                    }
+        //setTimeout(() => {
+        const JDUrl = {
+            url: 'https://api.m.jd.com/?client=wh5&functionId=qryH5BabelFloors',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Cookie: KEY,
+            },
+            body: `body={"activityId":"${acData[key]}"}`
+        };
+        $nobyda.post(JDUrl, function(error, response, data) {
+            try {
+                if (error) {
+                    merge[key].notify = `${title}: 签到活动获取失败 ‼️‼️`
+                    merge[key].fail = 1
+                } else {
+                    if (data.match(/enActK/)) { // 含有签到活动数据
+                        const od = JSON.parse(data);
+                        let params = (od.floatLayerList || []).filter(o=>o.params && o.params.match(/enActK/)).map(o=>o.params).pop();
+                        if(!params){ // 第一处找到签到所需数据
+                            // floatLayerList未找到签到所需数据，从floorList中查找
+                            let signInfo = (od.floorList || []).filter(o=>o.template=='signIn' && o.signInfos && o.signInfos.params && o.signInfos.params.match(/enActK/))
+                                .map(o=>o.signInfos).pop();
+                            if(signInfo){
+                                if(signInfo.signStat=='1'){
+                                    merge[key].notify = `${title}: 失败, 原因: 已签过 ⚠️`
+                                    merge[key].fail = 1
+                                    reject();
+                                    return;
+                                } else {
+                                    params = signInfo.params;
                                 }
                             }
-                            if(params){
-                                resolve({params: params}); // 执行签到处理
-                                return;
-                            }
                         }
-                        merge[key].notify = `${title}: 失败, 原因: 不含活动数据 ⚠️`
-                        merge[key].fail = 1
+                        if(params){
+                            resolve({params: params}); // 执行签到处理
+                            return;
+                        }
                     }
-                    reject()
-                } catch (eor) {
-                    $nobyda.notify(`${title}${eor.name} ‼️`, JSON.stringify(eor), eor.message)
-                    reject()
+                    merge[key].notify = `${title}: 失败, 原因: 不含活动数据 ⚠️`
+                    merge[key].fail = 1
                 }
-            })
-        }, s)
+                reject()
+            } catch (eor) {
+                $nobyda.notify(`${title}${eor.name} ‼️`, JSON.stringify(eor), eor.message)
+                reject()
+            }
+        })
+        //}, s)
         if (out) setTimeout(reject, out + s)
     }).then(data=>{
         return JDUserSign(s, key, title, encodeURIComponent(JSON.stringify(data)));
+    },()=>{});
+}
+
+function JDUserSignPre2(s, key, title) {
+    return new Promise((resolve, reject) => {
+        //setTimeout(() => {
+        const JDUrl = {
+            url: `https://pro.m.jd.com/mall/active/${acData[key]}/index.html`,
+            headers: {
+                Cookie: KEY,
+            }
+        };
+        $nobyda.get(JDUrl, function(error, response, data) {
+            try {
+                if (error) {
+                    merge[key].notify = `${title}: 签到活动获取失败 ‼️‼️`
+                    merge[key].fail = 1
+                } else {
+                    if (data.match(/"params":"{\\"enActK\\".*?\\"}"/)) { // 含有签到活动数据
+                        resolve(`{${data.match(/"params":"{\\"enActK\\".*?\\"}"/)}}`); // 执行签到处理
+                        return;
+                    }
+                    merge[key].notify = `${title}: 失败, 原因: 不含活动数据 ⚠️`
+                    merge[key].fail = 1
+                }
+                reject()
+            } catch (eor) {
+                $nobyda.notify(`${title}${eor.name} ‼️`, JSON.stringify(eor), eor.message)
+                reject()
+            }
+        })
+        //}, s)
+        if (out) setTimeout(reject, out + s)
+    }).then(data=>{
+        return JDUserSign(s, key, title, encodeURIComponent(data));
     },()=>{});
 }
 
