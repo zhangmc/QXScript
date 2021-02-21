@@ -2,4 +2,4 @@
 DOMAIN,wxsnsdy.wxs.qq.com,DIRECT
 DOMAIN,wxsnsdythumb.wxs.qq.com,DIRECT
 DOMAIN-SUFFIX,v2ex.com,DIRECT
-DOMAIN-SUFFIX,v2ex.com,DIRECT
+DOMAIN-SUFFIX,jdsharedresourcescdn.azureedge.net,PROXY
