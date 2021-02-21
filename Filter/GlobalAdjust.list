@@ -1,3 +1,4 @@
 # > Global Adjust
 DOMAIN-SUFFIX,paofucloud.com,PROXY
 DOMAIN-SUFFIX,getpocket.com,PROXY
+DOMAIN-SUFFIX,jdsharedresourcescdn.azureedge.net,PROXY
