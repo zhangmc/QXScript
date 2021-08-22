@@ -142,10 +142,6 @@ function getUserInfo() {
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
-            console.log(`${JSON.stringify(data)}`)
-            console.log(`\n【京东账号好友互助码】${data}\n`);
-            return;
-            //console.log(`\n【京东账号${$.index}（${$.nickName || $.UserName}）的${$.name}好友互助码】${data.data.shareTaskRes.itemId}\n`);
             // if (data.data.shareTaskRes) {
             //   console.log(`\n【京东账号${$.index}（${$.nickName || $.UserName}）的${$.name}好友互助码】${data.data.shareTaskRes.itemId}\n`);
             // } else {
@@ -391,8 +387,6 @@ function TotalBean() {
 
 function safeGet(data) {
   try {
-    console.log(data);
-    console.log(JSON.parse(data))
     if (typeof JSON.parse(data) == "object") {
       return true;
     }
