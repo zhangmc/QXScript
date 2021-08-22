@@ -391,6 +391,8 @@ function TotalBean() {
 
 function safeGet(data) {
   try {
+    console.log(data);
+    console.log(JSON.parse(data))
     if (typeof JSON.parse(data) == "object") {
       return true;
     }
