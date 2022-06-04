@@ -1,4 +1,5 @@
 # > Global Adjust
 #HOST-SUFFIX,paofucloud.com,PROXY
 #HOST-SUFFIX,getpocket.com,PROXY
-HOST-SUFFIX,jdsharedresourcescdn.azureedge.net,PROXY
+#HOST-SUFFIX,jdsharedresourcescdn.azureedge.net,PROXY
+HOST,cdn.jsdelivr.net,PROXY
